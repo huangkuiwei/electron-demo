@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow } = require('electron')
 const path = require('path')
 
 let mainWin
@@ -11,7 +11,8 @@ async function createWindow () {
       nodeIntegration: true,
       nodeIntegrationInWorker: true,
       webSecurity: true,
-      webviewTag: true
+      webviewTag: true,
+      enableRemoteModule: true
     }
   })
 
