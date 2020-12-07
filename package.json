@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/huangkuiwei/electron-demo#readme",
   "devDependencies": {
-    "electron": "^11.0.3"
+    "electron": "^11.0.3",
+    "vue-devtools": "^5.1.4"
   }
 }
