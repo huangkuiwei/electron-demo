@@ -5,8 +5,50 @@
     <title>electron-demo</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <webview class="webview" src="../webview/index.html" preload="../webview/index.js" nodeIntegration></webview>
+    </div>
   </body>
 
-  <script></script>
+  <script>
+    const { ipcRenderer, remote } = window.require('electron')
+    const webview = document.querySelector('.webview')
+
+    webview.addEventListener('dom-ready', () => {
+      console.log('dom-ready')
+      webview.openDevTools()
+
+      remote.webContents.fromId(webview.getWebContentsId()).send('event7', 'hello', 'event7')
+      remote.webContents.fromId(webview.getWebContentsId()).send('event12', 'hello', 'event12')
+    })
+
+    webview.addEventListener('ipc-message', (event) => {
+      console.log(event.args)
+    })
+
+    remote.ipcMain.on('event9', (event, ...args) => {
+      console.log(args)
+    })
+
+    remote.ipcMain.on('event10', (event, ...args) => {
+      console.log(args)
+    })
+
+    ipcRenderer.on('event6', (event, ...arg) => {
+      console.log(arg)
+    })
+
+    ipcRenderer.send('event1', 'hello', 'event1')
+    console.log(ipcRenderer.sendSync('event2', 'hello', 'event2'))
+
+    ipcRenderer.on('event3', (event, ...arg) => {
+      console.log(arg)
+    })
+
+    console.log(ipcRenderer.invoke('event4', 'hello', 'event4'))
+
+    ipcRenderer.on('event5', (event, ...arg) => {
+      console.log(arg)
+    })
+  </script>
 </html>

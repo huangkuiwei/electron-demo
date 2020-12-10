@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>webview</title>
+  </head>
+  <body>
+    <div>webview</div>
+
+    <script>
+      const { ipcRenderer } = window.require('electron')
+
+      ipcRenderer.send('event10', 'hello', 'event10')
+
+      ipcRenderer.sendToHost('event11', 'hello', 'event11')
+
+      ipcRenderer.on('event12', (event, ...args) => {
+        console.log(args)
+      })
+    </script>
+  </body>
+</html>
