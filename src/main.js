@@ -21,27 +21,8 @@ async function createWindow () {
   mainWin.openDevTools()
 }
 
-ipcMain.on('event1', (event, ...args) => {
-  console.log(args)
-})
-
-ipcMain.on('event2', (event, ...args) => {
-  console.log(args)
-  // event.reply('event5', 'hello', 'event5')
-  event.sender.send('event5', 'hello', 'event5')
-  event.returnValue = args
-})
-
-ipcMain.handle('event4', (event, ...args) => {
-  console.log(args)
-  return args
-})
-
 app.whenReady().then(async () => {
   await createWindow()
-
-  mainWin.webContents.send('event3', 'hello', 'event3')
-  mainWin.webContents.send('event6', 'hello', 'event6')
 })
 
 app.on('window-all-closed', () => {
@@ -55,4 +36,3 @@ app.on('activate', async () => {
     await createWindow()
   }
 })
-
