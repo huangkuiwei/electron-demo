@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, protocol } = require('electron')
 const path = require('path')
 
 let mainWin
@@ -21,7 +21,46 @@ async function createWindow () {
   mainWin.openDevTools()
 }
 
+function registerProtocol (protocol) {
+  app.removeAsDefaultProtocolClient(protocol)
+
+  if (process.platform === 'win32') { // window 环境下要做兼容
+    app.setAsDefaultProtocolClient(protocol, process.execPath, [path.resolve(process.argv[1])])
+  } else {
+    app.setAsDefaultProtocolClient(protocol)
+  }
+}
+
+function appInstanceLock () {
+  const lock = app.requestSingleInstanceLock()
+  if (!lock) {
+    app.quit()
+  } else {
+    app.on('second-instance', (event, argv) => {
+      if (mainWin.minimizable) {
+        mainWin.restore()
+      }
+
+      if (mainWin.isVisible()) {
+        mainWin.show()
+      }
+
+      console.log(argv)
+    })
+  }
+}
+
+function registerFileProtocol (scheme) {
+  protocol.registerFileProtocol(scheme, (request, callback) => {
+    const url = request.url.slice(scheme.length + 3)
+    callback({ path: path.resolve(__dirname, '../', url) })
+  })
+}
+
 app.whenReady().then(async () => {
+  registerProtocol('huang')
+  appInstanceLock()
+  registerFileProtocol('kui')
   await createWindow()
 })
 
