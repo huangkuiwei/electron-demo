@@ -7,11 +7,28 @@
   <body>
     <div id="app">
       <!--<webview class="webview" src="../webview/index.html" preload="../webview/index.js" nodeIntegration></webview>-->
-      <img src="kui://assets/01.jpg" alt="">
+      <!--<img src="kui://assets/01.jpg" alt="">-->
+      <button class="open-downloader">打开下载器</button>
     </div>
   </body>
 
   <script>
+    const { remote } = require('electron')
+    const path = require('path')
 
+    document.querySelector('.open-downloader').addEventListener('click', () => {
+      const downloaderWin = new remote.BrowserWindow({
+        width: 1500,
+        height: 900,
+        webPreferences: {
+          nodeIntegrationInWorker: true,
+          nodeIntegration: true,
+          webSecurity: true,
+          enableRemoteModule: true
+        }
+      })
+
+      downloaderWin.loadFile(path.resolve(__dirname, './downloader.html'))
+    })
   </script>
 </html>

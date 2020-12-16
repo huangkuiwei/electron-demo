@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>downloader</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      .create-downloader-dialog {
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        justify-content: center;
+        align-items: center;
+        display: none;
+      }
+
+      .create-downloader-dialog > .mask {
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background: #00000070;
+      }
+
+      .create-downloader-dialog > .wrap {
+        position: relative;
+        z-index: 1;
+        width: 500px;
+        border: 1px solid #cccccc;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 4px;
+      }
+
+      .create-downloader-dialog > .wrap label {
+        width: 85%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 10px 0;
+      }
+
+      .create-downloader-dialog > .wrap label > span:nth-child(1) {
+        width: 100px;
+      }
+
+      .create-downloader-dialog > .wrap label > input {
+        flex-grow: 1;
+        height: 35px;
+        text-indent: 10px;
+      }
+
+      .create-downloader-dialog > .wrap > .options {
+        margin-top: 10px;
+      }
+
+      .create-downloader-dialog > .wrap > .options > button {
+        width: 100px;
+        height: 35px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="options">
+      <button class="creat">新建下载</button>
+      <button class="clear">清空已完成</button>
+    </div>
+
+    <div class="progress"></div>
+
+    <div class="create-downloader-dialog">
+      <div class="mask"></div>
+
+      <div class="wrap">
+        <div>新建下载</div>
+
+        <label for="address">
+          <span>地址：</span>
+          <input id="address" type="text" placeholder="输入地址">
+        </label>
+
+        <label for="name">
+          <span>文件名：</span>
+          <input id="name" type="text" placeholder="文件名">
+        </label>
+
+        <label for="save">
+          <span>保存路径：</span>
+          <input id="save" type="text" disabled placeholder="文件保存路径">
+          <span class="select-path" style="margin-left: 10px; cursor: pointer">选择路径</span>
+        </label>
+
+        <div class="options">
+          <button class="cancel" style="margin-right: 20px;">取消</button>
+          <button class="submit">下载</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const { remote } = require('electron')
+      const creat = document.querySelector('.creat')
+      const clear = document.querySelector('.clear')
+      const save = document.querySelector('#save')
+      const path = document.querySelector('.select-path')
+      const wrap = document.querySelector('.wrap')
+      const mask = document.querySelector('.mask')
+      const cancel = document.querySelector('.cancel')
+      const submit = document.querySelector('.submit')
+      const address = document.querySelector('#address')
+      const name = document.querySelector('#name')
+      const downloaderDialog = document.querySelector('.create-downloader-dialog')
+
+      save.value = remote.app.getPath('downloads')
+
+      wrap.addEventListener('click', event => {
+        event.stopPropagation()
+      })
+
+      mask.addEventListener('click', () => {
+        downloaderDialog.style.display = 'none'
+      })
+
+      cancel.addEventListener('click', () => {
+        downloaderDialog.style.display = 'none'
+      })
+
+      path.addEventListener('click', () => {
+        remote.dialog.showOpenDialog({
+          defaultPath: save.value,
+          properties: ['openDirectory']
+        }).then(res => {
+          if (!res.canceled) {
+            save.value = res.filePaths[0]
+          }
+        })
+      })
+
+      creat.addEventListener('click', () => {
+        downloaderDialog.style.display = 'flex'
+      })
+
+      submit.addEventListener('click', () => {
+        if (!address.value) {
+          alert('请输入地址')
+          return
+        }
+
+        if (!name.value) {
+          alert('请输入文件名')
+          return
+        }
+
+        remote.getCurrentWebContents().downloadURL(address.value)
+      })
+
+      remote.getCurrentWebContents().session.on('will-download', (event, item) => {
+        // console.log('file:\\\\' + save.value + '\\' + name.value)
+        // item.setSavePath('file:\\\\' + save.value + '\\' + name.value)
+      })
+    </script>
+  </body>
+</html>
